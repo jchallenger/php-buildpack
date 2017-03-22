@@ -1,3 +1,6 @@
+# Credits to AAlap Shah(https://github.com/fishfin) for his work on IBM DB integration with CF php-buildpack.
+
+
 import logging
 import os
 import StringIO
