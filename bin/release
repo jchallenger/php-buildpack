@@ -14,7 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 # Wrapper script that launches Python Build Pack
 #  At the moment, this just launches the appropriate
 #  python script.  However, this is here in case the
@@ -22,4 +22,5 @@
 #  python scripts, like install Python.
 BP=$(dirname $(dirname $0))
 export PYTHONPATH=$BP/lib
+
 python $BP/scripts/release.py $1

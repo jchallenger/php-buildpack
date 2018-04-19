@@ -63,9 +63,10 @@ class Configurer(object):
     def user_config(self, path=None, step=None):
         if path is None:
             path = os.path.join('.bp-config', 'options.json')
-        self._merge(
-            CloudFoundryUtil.load_json_config_file_from(
-                self.builder._ctx['BUILD_DIR'], path, step))
+        dict = CloudFoundryUtil.load_json_config_file_from(self.builder._ctx['BUILD_DIR'], path, step)
+        if len(dict.get('PHP_EXTENSIONS', [])) > 0:
+            self._merge({'OPTIONS_JSON_HAS_PHP_EXTENSIONS': True})
+        self._merge(dict)
         return self
 
     def validate(self):
@@ -628,11 +629,16 @@ class FileUtil(object):
                 if self._move:
                     for d in dirs:
                         dirPath = os.path.join(root, d)
-                        if len(os.listdir(dirPath)) == 0:
+                        if not os.path.exists(dirPath):
+                            self._log.debug(
+                                "Cleaning up symlink [%s] as directory has been removed",
+                                dirPath)
+                            os.unlink(dirPath)
+                        elif len(os.listdir(dirPath)) == 0:
                             self._log.debug(
                                 "Cleaning up empty directory [%s]",
                                 dirPath)
-                            os.rmdir(os.path.join(root, d))
+                            os.rmdir(dirPath)
         return self._builder
 
 

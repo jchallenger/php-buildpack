@@ -23,9 +23,15 @@ import logging
 import re
 import json
 import StringIO
+import copy
+import shutil
 from build_pack_utils import utils
 from build_pack_utils import stream_output
+from compile_helpers import warn_invalid_php_version
 from extension_helpers import ExtensionHelper
+
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'vendor', 'node-semver'))
+from semver import max_satisfying
 
 from build_pack_utils.compile_extensions import CompileExtensions
 
@@ -95,22 +101,22 @@ class ComposerConfiguration(object):
 
     def pick_php_version(self, requested):
         selected = None
-        if requested is None:
-            selected = self._ctx['PHP_VERSION']
-        elif requested == '5.6.*' or requested == '>=5.6':
+
+        if requested is None or requested is '':
+            return self._ctx['PHP_VERSION']
+
+        # requested is coming from the composer.json file and is a unicode string type.
+        # Since it's just a semver string, it shouldn't actually contain any unicode
+        # characters. So it should be safe to turn it into an ASCII string
+        translated_requirement = str(requested.replace('>=', '~>'))
+
+        selected = max_satisfying(self._ctx['ALL_PHP_VERSIONS'], translated_requirement, loose=False)
+
+        if selected is None:
+            docs_link = 'http://docs.cloudfoundry.org/buildpacks/php/gsg-php-composer.html'
+            warn_invalid_php_version(requested, self._ctx['PHP_56_LATEST'], docs_link)
             selected = self._ctx['PHP_56_LATEST']
-        elif requested == '7.0.*' or requested == '>=7.0':
-            selected = self._ctx['PHP_70_LATEST']
-        elif requested == '7.1.*' or requested == '>=7.1':
-            selected = self._ctx['PHP_71_LATEST']
-        elif requested.startswith('5.6.'):
-            selected = requested
-        elif requested.startswith('7.0.'):
-            selected = requested
-        elif requested.startswith('7.1.'):
-            selected = requested
-        else:
-            selected = self._ctx['PHP_VERSION']
+
         return selected
 
     def get_composer_contents(self, file_path):
@@ -176,7 +182,9 @@ class ComposerExtension(ExtensionHelper):
             'COMPOSER_INSTALL_OPTIONS': ['--no-interaction', '--no-dev'],
             'COMPOSER_VENDOR_DIR': '{BUILD_DIR}/{LIBDIR}/vendor',
             'COMPOSER_BIN_DIR': '{BUILD_DIR}/php/bin',
-            'COMPOSER_CACHE_DIR': '{CACHE_DIR}/composer'
+            'COMPOSER_HOME': '{CACHE_DIR}/composer',
+            'COMPOSER_CACHE_DIR': '{COMPOSER_HOME}/cache',
+            'COMPOSER_INSTALL_GLOBAL': []
         }
 
     def _should_compile(self):
@@ -187,9 +195,15 @@ class ComposerExtension(ExtensionHelper):
     def _compile(self, install):
         self._builder = install.builder
         self.composer_runner = ComposerCommandRunner(self._ctx, self._builder)
+        self.clean_cache_dir()
         self.move_local_vendor_folder()
         self.install()
         self.run()
+
+    def clean_cache_dir(self):
+        if not os.path.exists(self._ctx['COMPOSER_CACHE_DIR']):
+            self._log.debug("Old style cache directory exists, removing")
+            shutil.rmtree(self._ctx['COMPOSER_HOME'], ignore_errors=True)
 
     def move_local_vendor_folder(self):
         vendor_path = os.path.join(self._ctx['BUILD_DIR'],
@@ -322,6 +336,14 @@ class ComposerExtension(ExtensionHelper):
                 token_is_valid = self.setup_composer_github_token()
             # check that the api rate limit has not been exceeded, otherwise exit
             self.check_github_rate_exceeded(token_is_valid)
+        # install global Composer dependencies
+        if len(self._ctx['COMPOSER_INSTALL_GLOBAL']) > 0:
+            globalCtx = copy.deepcopy(self._ctx)
+            globalCtx['COMPOSER_VENDOR_DIR'] = '{COMPOSER_HOME}/vendor'
+            globalCtx['COMPOSER_BIN_DIR'] = '{COMPOSER_HOME}/bin'
+            globalRunner = ComposerCommandRunner(globalCtx, self._builder)
+            globalRunner.run('global', 'require', '--no-progress',
+                             *self._ctx['COMPOSER_INSTALL_GLOBAL'])
         # install dependencies w/Composer
         self.composer_runner.run('install', '--no-progress',
                                  *self._ctx['COMPOSER_INSTALL_OPTIONS'])
@@ -344,6 +366,7 @@ class ComposerCommandRunner(object):
             env[key] = val if type(val) == str else json.dumps(val)
 
         # add basic composer vars
+        env['COMPOSER_HOME'] = self._ctx['COMPOSER_HOME']
         env['COMPOSER_VENDOR_DIR'] = self._ctx['COMPOSER_VENDOR_DIR']
         env['COMPOSER_BIN_DIR'] = self._ctx['COMPOSER_BIN_DIR']
         env['COMPOSER_CACHE_DIR'] = self._ctx['COMPOSER_CACHE_DIR']
@@ -353,10 +376,11 @@ class ComposerCommandRunner(object):
         env['PHPRC'] = self._ctx['TMPDIR']
         env['PATH'] = ':'.join(filter(None,
                                       [env.get('PATH', ''),
-                                       os.path.dirname(self._php_path)]))
-        self._log.debug("ENV IS: %s",
-                        '\n'.join(["%s=%s (%s)" % (key, val, type(val))
-                                   for (key, val) in env.iteritems()]))
+                                       os.path.dirname(self._php_path),
+                                       os.path.join(self._ctx['COMPOSER_HOME'], 'bin')]))
+        for key, val in env.iteritems():
+            self._log.debug("ENV IS: %s=%s (%s)", key, val, type(val))
+
         return env
 
     def run(self, *args):

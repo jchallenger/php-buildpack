@@ -225,7 +225,8 @@ class TestComposer(object):
         ctx = utils.FormattedDict({
             'BUILD_DIR': 'tests/data/composer',
             'WEBDIR': '',
-            'PHP_56_LATEST': '5.6.31'
+            'PHP_56_LATEST': '5.6.31',
+            'ALL_PHP_VERSIONS': ['5.6.31', '5.6.29', '7.0.13', '7.0.14', '7.1.3', '7.1.4']
         })
         config = self.extension_module.ComposerConfiguration(ctx)
         config.configure()
@@ -244,7 +245,8 @@ class TestComposer(object):
             'BUILD_DIR': 'tests/data/composer',
             'WEBDIR': '',
             'PHP_EXTENSIONS': ['a', 'b'],
-            'PHP_56_LATEST': '5.6.31'
+            'PHP_56_LATEST': '5.6.31',
+            'ALL_PHP_VERSIONS': ['5.6.31', '5.6.29', '7.0.13', '7.0.14', '7.1.3', '7.1.4']
         })
         config = self.extension_module.ComposerConfiguration(ctx)
         config.configure()
@@ -306,7 +308,8 @@ class TestComposer(object):
         ctx = utils.FormattedDict({
             'BUILD_DIR': 'tests/data/composer',
             'WEBDIR': '',
-            'PHP_56_LATEST': '5.6.31'
+            'PHP_56_LATEST': '5.6.31',
+            'ALL_PHP_VERSIONS': ['5.6.31', '5.6.29', '7.0.13', '7.0.14', '7.1.3', '7.1.4']
         })
         fcp_orig = self.extension_module.find_composer_paths
         # test when no composer.json or composer.lock files found
@@ -361,29 +364,33 @@ class TestComposer(object):
             'PHP_56_LATEST': '5.6.29',
             'PHP_70_LATEST': '7.0.14',
             'PHP_71_LATEST': '7.1.4',
-            'WEBDIR': ''
+            'WEBDIR': '',
+            'ALL_PHP_VERSIONS': ['5.6.28', '5.6.29', '7.0.13', '7.0.14', '7.1.3', '7.1.4']
         }
         pick_php_version = \
             self.extension_module.ComposerConfiguration(ctx).pick_php_version
         # default to 5.6
         # latest PHP 5.6 version
         eq_('5.6.29', pick_php_version('>=5.6'))
+        eq_('5.6.29', pick_php_version('>=5.6.0'))
         eq_('5.6.29', pick_php_version('5.6.*'))
         # exact PHP 5.6 versions
-        eq_('5.6.29', pick_php_version('5.6.29'))
-        eq_('5.6.6', pick_php_version('5.6.6'))
+        eq_('5.6.28', pick_php_version('5.6.28'))
         # latest PHP 7.0 version
         eq_('7.0.14', pick_php_version('>=7.0'))
+        eq_('7.0.14', pick_php_version('>=7.0.0'))
         eq_('7.0.14', pick_php_version('7.0.*'))
         # exact PHP 7.0 versions
-        eq_('7.0.1', pick_php_version('7.0.1'))
-        eq_('7.0.2', pick_php_version('7.0.2'))
+        eq_('7.0.13', pick_php_version('7.0.13'))
         # PHP 7.1 versions
-        eq_('7.1.1', pick_php_version('7.1.1'))
-        eq_('7.1.2', pick_php_version('7.1.2'))
+        eq_('7.1.3', pick_php_version('7.1.3'))
         eq_('7.1.4', pick_php_version('>=7.1'))
+        eq_('7.1.4', pick_php_version('>=7.1.0'))
         eq_('7.1.4', pick_php_version('7.1.*'))
-        # not understood, should default to PHP_VERSION
+        # not in buildpack, should default to PHP_VERSION
+        eq_('5.6.29', pick_php_version('7.1.2'))
+        eq_('5.6.29', pick_php_version('7.0.2'))
+        eq_('5.6.29', pick_php_version('5.6.6'))
         eq_('5.6.29', pick_php_version(''))
         eq_('5.6.29', pick_php_version(None))
         eq_('5.6.29', pick_php_version('5.61.1'))
@@ -438,7 +445,7 @@ class TestComposer(object):
         ct = self.extension_module.ComposerExtension(ctx)
         eq_('/tmp/build/lib/vendor', ct._ctx['COMPOSER_VENDOR_DIR'])
         eq_('/tmp/build/php/bin', ct._ctx['COMPOSER_BIN_DIR'])
-        eq_('/tmp/cache/composer', ct._ctx['COMPOSER_CACHE_DIR'])
+        eq_('/tmp/cache/composer/cache', ct._ctx['COMPOSER_CACHE_DIR'])
 
     def test_composer_custom_values(self):
         ctx = utils.FormattedDict({
@@ -634,7 +641,7 @@ class TestComposer(object):
             built_environment = cr._build_composer_environment()
 
         assert 'PATH' in built_environment, "should have PATH set"
-        assert "/usr/awesome/php/bin" == built_environment['PATH'], \
+        assert "/usr/awesome/php/bin:cache/composer/bin" == built_environment['PATH'], \
             "PATH should contain path to PHP, found [%s]" \
             % built_environment['PATH']
 
@@ -661,7 +668,7 @@ class TestComposer(object):
             built_environment = cr._build_composer_environment()
 
         assert 'PATH' in built_environment, "should have PATH set"
-        assert built_environment['PATH'].endswith(":/usr/awesome/php/bin"), \
+        assert built_environment['PATH'].endswith(":/usr/awesome/php/bin:cache/composer/bin"), \
             "PATH should contain path to PHP, found [%s]" \
             % built_environment['PATH']
 

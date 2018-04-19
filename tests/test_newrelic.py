@@ -118,7 +118,8 @@ class TestNewRelic(object):
         eq_('@{HOME}/newrelic/agent/x64/newrelic-20131226.so', nr.newrelic_so)
         eq_('app-name-1', nr.app_name)
         eq_('JUNK_LICENSE', nr.license_key)
-        eq_('@{HOME}/logs/newrelic-daemon.log', nr.log_path)
+        eq_('@{HOME}/logs/newrelic.log', nr.log_path)
+        eq_('@{HOME}/logs/newrelic-daemon.log', nr.daemon_log_path)
         eq_('@{HOME}/newrelic/daemon/newrelic-daemon.x64', nr.daemon_path)
         eq_('@{HOME}/newrelic/daemon.sock', nr.socket_path)
         eq_('@{HOME}/newrelic/daemon.pid', nr.pid_path)
@@ -151,7 +152,8 @@ class TestNewRelic(object):
         eq_('@{HOME}/newrelic/agent/x64/newrelic-20131226.so', nr.newrelic_so)
         eq_('app-name-1', nr.app_name)
         eq_('LICENSE', nr.license_key)
-        eq_('@{HOME}/logs/newrelic-daemon.log', nr.log_path)
+        eq_('@{HOME}/logs/newrelic.log', nr.log_path)
+        eq_('@{HOME}/logs/newrelic-daemon.log', nr.daemon_log_path)
         eq_('@{HOME}/newrelic/daemon/newrelic-daemon.x64', nr.daemon_path)
         eq_('@{HOME}/newrelic/daemon.sock', nr.socket_path)
         eq_('@{HOME}/newrelic/daemon.pid', nr.pid_path)
@@ -185,7 +187,8 @@ class TestNewRelic(object):
         eq_('@{HOME}/newrelic/agent/x64/newrelic-20131226.so', nr.newrelic_so)
         eq_('app-name-2', nr.app_name)
         eq_('LICENSE2', nr.license_key)
-        eq_('@{HOME}/logs/newrelic-daemon.log', nr.log_path)
+        eq_('@{HOME}/logs/newrelic.log', nr.log_path)
+        eq_('@{HOME}/logs/newrelic-daemon.log', nr.daemon_log_path)
         eq_('@{HOME}/newrelic/daemon/newrelic-daemon.x64', nr.daemon_path)
         eq_('@{HOME}/newrelic/daemon.sock', nr.socket_path)
         eq_('@{HOME}/newrelic/daemon.pid', nr.pid_path)
@@ -207,7 +210,7 @@ class TestNewRelic(object):
             lines = php_ini.readlines()
         eq_(True, lines.index('extension=%s\n' % nr.newrelic_so) >= 0)
         eq_(True, lines.index('[newrelic]\n') >= 0)
-        eq_(True, lines.index('newrelic.license=JUNK_LICENSE\n') >= 0)
+        eq_(True, lines.index('newrelic.license=@{NEWRELIC_LICENSE}\n') >= 0)
         eq_(True, lines.index('newrelic.appname=%s\n' % nr.app_name) >= 0)
 
 
@@ -302,17 +305,17 @@ default_versions:
 
 dependencies:
 - name: newrelic
-  version: 6.3.0.161
-  uri: https://download.newrelic.com/php_agent/archive/6.3.0.161/newrelic-php5-6.3.0.161-linux.tar.gz
+  version: 7.4.0.198
+  uri: https://download.newrelic.com/php_agent/archive/7.4.0.198/newrelic-php5-7.4.0.198-linux.tar.gz
   cf_stacks:
   - cflinuxfs2
-  md5: 3640d3cad6b5199f54a6b54a627235d6
+  sha256: 3640d3cad6b5199f54a6b54a627235d6
 - name: newrelic
   version: 6.4.0.99
   uri: https://download.newrelic.com/php_agent/archive/6.4.0.99/newrelic-php5-6.4.0.99-linux.tar.gz
   cf_stacks:
   - cflinuxfs2
-  md5: a5d5178f0f8133a65baf942a07408ba6
+  sha256: a5d5178f0f8133a65baf942a07408ba6
 '''
 GOOD_MANIFEST = '''\
 ---
@@ -324,15 +327,15 @@ default_versions:
 
 dependencies:
 - name: newrelic
-  version: 6.3.0.161
-  uri: https://download.newrelic.com/php_agent/archive/6.3.0.161/newrelic-php5-6.3.0.161-linux.tar.gz
+  version: 7.4.0.198
+  uri: https://download.newrelic.com/php_agent/archive/7.4.0.198/newrelic-php5-7.4.0.198-linux.tar.gz
   cf_stacks:
   - cflinuxfs2
-  md5: 3640d3cad6b5199f54a6b54a627235d6
+  sha256: 3640d3cad6b5199f54a6b54a627235d6
 - name: newrelic
   version: 6.4.0.99
   uri: https://download.newrelic.com/php_agent/archive/6.4.0.99/newrelic-php5-6.4.0.99-linux.tar.gz
   cf_stacks:
   - cflinuxfs2
-  md5: a5d5178f0f8133a65baf942a07408ba6
+  sha256: a5d5178f0f8133a65baf942a07408ba6
 '''

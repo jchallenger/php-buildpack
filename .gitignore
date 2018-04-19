@@ -9,7 +9,9 @@ binaries/trusty/*
 /env
 *_buildpack*.zip
 /log/
-vendor
 *.DS_Store
 .bundle
 DebugKit
+/pkg/
+/.bin/
+.idea
