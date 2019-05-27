@@ -51,30 +51,6 @@ var _ = Describe("CF PHP Buildpack", func() {
 	AfterEach(func() { app = DestroyApp(app) })
 
 	Context("extensions are specified in .bp-config", func() {
-		It("deploying a basic PHP5 app that loads all prepackaged extensions", func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_5_all_modules"))
-			app.SetEnv("COMPOSER_GITHUB_OAUTH_TOKEN", os.Getenv("COMPOSER_GITHUB_OAUTH_TOKEN"))
-
-			By("warns about deprecated PHP_EXTENSIONS", func() {
-				PushAppAndConfirm(app)
-				Expect(app.Stdout.String()).To(ContainSubstring("Warning: PHP_EXTENSIONS in options.json is deprecated."))
-			})
-
-			ItLoadsAllTheModules(app, "5")
-		})
-
-		It("deploying a basic PHP7.0 app that loads all prepackaged extensions", func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_7_all_modules"))
-			app.SetEnv("COMPOSER_GITHUB_OAUTH_TOKEN", os.Getenv("COMPOSER_GITHUB_OAUTH_TOKEN"))
-
-			By("warns about deprecated PHP_EXTENSIONS", func() {
-				PushAppAndConfirm(app)
-				Expect(app.Stdout.String()).To(ContainSubstring("Warning: PHP_EXTENSIONS in options.json is deprecated."))
-			})
-
-			ItLoadsAllTheModules(app, "7.0")
-		})
-
 		It("deploying a basic PHP7.1 app that loads all prepackaged extensions", func() {
 			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_71_all_modules"))
 			app.SetEnv("COMPOSER_GITHUB_OAUTH_TOKEN", os.Getenv("COMPOSER_GITHUB_OAUTH_TOKEN"))
@@ -86,31 +62,47 @@ var _ = Describe("CF PHP Buildpack", func() {
 
 			ItLoadsAllTheModules(app, "7.1")
 		})
+
+		It("deploying a basic PHP7.1 app with cflinuxfs3 only extensions", func() {
+			SkipUnlessCflinuxfs3()
+
+			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_71_fs3_extensions"))
+			app.SetEnv("COMPOSER_GITHUB_OAUTH_TOKEN", os.Getenv("COMPOSER_GITHUB_OAUTH_TOKEN"))
+
+			By("warns about deprecated PHP_EXTENSIONS", func() {
+				PushAppAndConfirm(app)
+				Expect(app.Stdout.String()).To(ContainSubstring("Warning: PHP_EXTENSIONS in options.json is deprecated."))
+			})
+
+			body, err := app.GetBody("/")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "sqlsrv"))
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "pdo_sqlsrv"))
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "maxminddb"))
+		})
+
+		It("deploying a basic PHP7.2 app with cflinuxfs3 extensions", func() {
+			SkipUnlessCflinuxfs3()
+
+			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_72_fs3_extensions"))
+			app.SetEnv("COMPOSER_GITHUB_OAUTH_TOKEN", os.Getenv("COMPOSER_GITHUB_OAUTH_TOKEN"))
+
+			By("warns about deprecated PHP_EXTENSIONS", func() {
+				PushAppAndConfirm(app)
+				Expect(app.Stdout.String()).To(ContainSubstring("Warning: PHP_EXTENSIONS in options.json is deprecated."))
+			})
+
+			body, err := app.GetBody("/")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "sqlsrv"))
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "pdo_sqlsrv"))
+			Expect(body).To(MatchRegexp("(?i)module_(Zend[+ ])?%s", "maxminddb"))
+		})
 	})
 
 	Context("extensions are specified in composer.json", func() {
-		It("deploying a basic PHP5 app that loads all prepackaged extensions", func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_5_all_modules_composer"))
-			PushAppAndConfirm(app)
-
-			ItLoadsAllTheModules(app, "5")
-
-			By("does not warn about deprecated PHP_EXTENSIONS", func() {
-				Expect(app.Stdout.String()).ToNot(ContainSubstring("Warning: PHP_EXTENSIONS in options.json is deprecated."))
-			})
-		})
-
-		It("deploying a basic PHP7.0 app that loads all prepackaged extensions", func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_7_all_modules_composer"))
-			PushAppAndConfirm(app)
-
-			ItLoadsAllTheModules(app, "7.0")
-
-			By("does not warn about deprecated PHP_EXTENSIONS", func() {
-				Expect(app.Stdout.String()).ToNot(ContainSubstring("Warning: PHP_EXTENSIONS in options.json is deprecated."))
-			})
-		})
-
 		It("deploying a basic PHP7.1 app that loads all prepackaged extensions", func() {
 			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_71_all_modules_composer"))
 			PushAppAndConfirm(app)

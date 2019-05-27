@@ -18,28 +18,6 @@ var _ = Describe("CF PHP Buildpack", func() {
 		app.SetEnv("COMPOSER_GITHUB_OAUTH_TOKEN", os.Getenv("COMPOSER_GITHUB_OAUTH_TOKEN"))
 	})
 
-	Context("deploying a basic PHP5 app with custom conf files in php.ini.d dir in app root", func() {
-		BeforeEach(func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_5_with_php_ini_d"))
-		})
-
-		It("sets custom configurations", func() {
-			PushAppAndConfirm(app)
-			Expect(app.GetBody("/")).To(ContainSubstring("teststring"))
-		})
-	})
-
-	Context("deploying a basic PHP7 app with custom conf files in php.ini.d dir in app root", func() {
-		BeforeEach(func() {
-			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_7_with_php_ini_d"))
-		})
-
-		It("sets custom configurations", func() {
-			PushAppAndConfirm(app)
-			Expect(app.GetBody("/")).To(ContainSubstring("teststring"))
-		})
-	})
-
 	Context("deploying a basic PHP71 app with custom conf files in php.ini.d dir in app root", func() {
 		BeforeEach(func() {
 			app = cutlass.New(filepath.Join(bpDir, "fixtures", "php_71_with_php_ini_d"))
@@ -48,6 +26,7 @@ var _ = Describe("CF PHP Buildpack", func() {
 		It("sets custom configurations", func() {
 			PushAppAndConfirm(app)
 			Expect(app.GetBody("/")).To(ContainSubstring("teststring"))
+			Expect(app.Stdout.String()).To(ContainSubstring("PHP 7.1"))
 		})
 	})
 

@@ -78,26 +78,27 @@ def load_manifest(ctx):
 
 def find_all_php_versions(dependencies):
     versions = []
+    stack = os.getenv('CF_STACK')
 
     for dependency in dependencies:
-        if dependency['name'] == 'php':
+        if dependency['name'] == 'php' and (dependency.get('cf_stacks', []) == [] or stack in dependency['cf_stacks']): # cf_stacks will be empty (or nonexistent) for a stack-associated manifest
             versions.append(dependency['version'])
 
     return versions
 
- 
+
 def validate_php_version(ctx):
     if ctx['PHP_VERSION'] in ctx['ALL_PHP_VERSIONS']:
         _log.debug('App selected PHP [%s]', ctx['PHP_VERSION'])
     else:
         _log.warning('Selected version of PHP [%s] not available.  Defaulting'
                      ' to the latest version [%s]',
-                     ctx['PHP_VERSION'], ctx['PHP_56_LATEST'])
+                     ctx['PHP_VERSION'], ctx['PHP_DEFAULT'])
 
         docs_link = 'http://docs.cloudfoundry.org/buildpacks/php/gsg-php-tips.html'
-        warn_invalid_php_version(ctx['PHP_VERSION'], ctx['PHP_56_LATEST'], docs_link)
+        warn_invalid_php_version(ctx['PHP_VERSION'], ctx['PHP_DEFAULT'], docs_link)
 
-        ctx['PHP_VERSION'] = ctx['PHP_56_LATEST']
+        ctx['PHP_VERSION'] = ctx['PHP_DEFAULT']
 
 
 def _get_supported_php_extensions(ctx):
@@ -118,8 +119,11 @@ def _get_compiled_modules(ctx):
     output_to_skip = ['[PHP Modules]', '[Zend Modules]', '']
 
     php_binary = os.path.join(ctx["PHP_INSTALL_PATH"], 'bin', 'php')
+    env = {
+        'LD_LIBRARY_PATH': os.path.join(ctx["PHP_INSTALL_PATH"], 'lib')
+    }
 
-    process = subprocess.Popen([php_binary, '-m'], stdout=subprocess.PIPE)
+    process = subprocess.Popen([php_binary, '-m'], stdout=subprocess.PIPE, env=env)
     exit_code = process.wait()
     output = process.stdout.read().rstrip()
 
@@ -163,13 +167,21 @@ def _parse_extensions_from_ini_file(file):
 def validate_php_ini_extensions(ctx):
     all_supported =  _get_supported_php_extensions(ctx) + _get_compiled_modules(ctx)
     ini_files = glob.glob(os.path.join(ctx["BUILD_DIR"], '.bp-config', 'php', 'php.ini.d', '*.ini'))
+    is_redis = False
+    is_igbinary = False
 
     for file in ini_files:
         extensions = _parse_extensions_from_ini_file(file)
         for ext in extensions:
             if ext not in all_supported:
                 raise RuntimeError("The extension '%s' is not provided by this buildpack." % ext)
+            elif ext == "redis":
+                is_redis = True
+            elif ext == "igbinary":
+                is_igbinary  = True
 
+    if is_redis and not is_igbinary:
+        ctx['PHP_EXTENSIONS'].append("igbinary")
 
 def include_fpm_d_confs(ctx):
     ctx['PHP_FPM_CONF_INCLUDE'] = ''

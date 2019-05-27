@@ -1,3 +1,513 @@
+v4.3.77 May 06, 2019
+=====================
+
+* Merge pull request #300 from dmikusa-pivotal/develop
+  Move the inclusion of php-fpm config snippets to the end of the php-fpm.conf file
+
+* Add php 7.1.29, remove php 7.1.27
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165785258)
+
+* Add php 7.2.18, remove php 7.2.16
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165763831)
+
+* Add php 7.3.5, remove php 7.3.3
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165762914)
+
+* Move the inclusion of php-fpm config snippets to the end of the php-fpm.conf file. This allows users to override all settings. See Issue #299.
+
+
+v4.3.76 May 01, 2019
+=====================
+
+* Add nginx 1.16.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165612537)
+
+
+v4.3.75 Apr 23, 2019
+=====================
+
+* Remove warning logs causing bosh cli error
+
+* Add appdynamics 4.5.9.2753, remove appdynamics 4.5.8.2700
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165489583)
+
+* Add nginx 1.15.12, remove nginx 1.15.11
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165387664)
+
+
+v4.3.74 Apr 12, 2019
+=====================
+
+* Add composer 1.8.5, remove composer 1.8.4
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165221414)
+
+* Add nginx 1.15.11, remove nginx 1.15.10
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165215032)
+
+* Add php 7.1.28, remove php 7.1.26
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165128941)
+
+* Add php 7.2.17, remove php 7.2.15
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165125089)
+
+
+v4.3.73 Apr 04, 2019
+=====================
+
+* Add php 7.3.4, remove php 7.3.2
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165119913)
+
+* Add httpd 2.4.39, remove httpd 2.4.38
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165044236)
+
+* Add nginx 1.15.10, remove nginx 1.15.9
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164899138)
+
+* Add appdynamics 4.5.8.2700, remove appdynamics 4.5.7.2661
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164895105)
+
+v4.3.72 Mar 08, 2019
+=====================
+
+* Remove php 5.x and 7.0.x
+  (https://www.pivotaltracker.com/story/show/163160136)
+
+* Add php 7.1.27, remove php 7.1.25
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164462657)
+
+* Add php 7.2.16, remove php 7.2.14
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164460548)
+
+* Add php 7.3.3, remove php 7.3.1
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164459111)
+
+* Add appdynamics 4.5.7.2661, remove appdynamics 4.5.7.2643
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164457940)
+
+
+v4.3.71 Mar 01, 2019
+=====================
+
+* Add php 7.2.15, remove php 7.2.13
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163787459)
+
+* Add composer 1.8.4, remove composer 1.8.3
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163860100)
+
+* Add php 7.3.2, remove php 7.3.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163787462)
+
+* Add nginx 1.15.9, remove nginx 1.15.8
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164249501)
+
+* Add appdynamics 4.5.7.2643, remove appdynamics 4.5.6.2534
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164136366)
+
+* Check if proxy env is empty before adding the handler
+
+* Updates to the Dynatrace extension
+  - Set logging to stdout by default.
+  - Don't explicitly set the host ID, the agent will do so automatically.
+  - Support config entry "location" for the service
+
+* Add source and source_sha256 to buildpack manifest
+  (https://www.pivotaltracker.com/story/show/163711928)
+  (https://www.pivotaltracker.com/story/show/163114792)
+
+* Update PHP Extensions
+  (https://www.pivotaltracker.com/story/show/162899806)
+
+* Check if proxy env is empty before adding the handler
+  In cases where the variable is set but empty, the handler is added
+  and download may fail as urllib can't parse the host.
+
+v4.3.70 Jan 31, 2019
+=====================
+
+* Add composer 1.8.3, remove composer 1.8.2
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163583504)
+
+* Add libzip and remove zlib
+  (https://www.pivotaltracker.com/story/show/163115785)
+
+* Add php 7.3.0, 7.3.1, and adds a default php-fpm.conf file for 7.3.x
+  (https://www.pivotaltracker.com/story/show/163115785)
+
+* Add php 7.3.1, remove php 7.3.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163115785)
+
+* Add php 7.3.0
+  for stack(s) cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162482741)
+
+* Adds PHP_73_LATEST value to options.json
+  (https://www.pivotaltracker.com/story/show/163115785)
+
+* Add httpd 2.4.38, remove httpd 2.4.37
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163412491)
+
+
+v4.3.69 Jan 22, 2019
+=====================
+
+* Add php 5.6.40, remove php 5.6.38
+  for stack(s) cflinuxfs2
+  (https://www.pivotaltracker.com/story/show/163136458)
+
+* Add php 7.1.26, remove php 7.1.24
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163130351)
+
+* Add appdynamics 4.5.6.2534, remove appdynamics 4.5.5.2452
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163132156)
+
+* Add php 7.2.14, remove php 7.2.12
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163114792)
+
+v4.3.68 Jan 08, 2019
+=====================
+
+* Added support for maxmind extension
+  (https://www.pivotaltracker.com/story/show/156570432)
+
+* Add nginx 1.15.8, remove nginx 1.15.7
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162839811)
+
+v4.3.67 Dec 18, 2018
+=====================
+
+* Add sqlsrv and pdo_sqlsrv to php7 on cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162546591)
+
+v4.3.66 Dec 07, 2018
+=====================
+
+* Add appdynamics 4.5.5.2452, remove appdynamics 4.5.4.2296
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162499475)
+
+* Add php 7.2.13, remove php 7.2.11
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162483893)
+
+* Add php 7.1.25, remove php 7.1.23
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162483894)
+
+* Add php 7.0.33, remove php 7.0.31
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162494097)
+
+* Add php 5.6.39, remove php 5.6.37
+  for stack(s) cflinuxfs2
+  (https://www.pivotaltracker.com/story/show/162481819)
+
+* Add nginx 1.14.2, remove nginx 1.14.1
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162417429)
+
+
+v4.3.65 Dec 04, 2018
+=====================
+
+* Add composer 1.8.0, remove composer 1.7.3
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162377924)
+
+* Add fix for redis extension
+  (https://www.pivotaltracker.com/story/show/162054194)
+
+* Add nginx 1.15.7, remove nginx 1.15.6
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162240857)
+
+* Add appdynamics 4.5.4.2296, remove appdynamics 4.5.2.2042
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162088431)
+
+* Add php 7.1.24, remove php 7.1.21
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161816597)
+
+* Add php 7.2.12, remove php 7.2.9
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161809024)
+
+v4.3.64 Nov 07, 2018
+=====================
+
+* Add nginx 1.15.6, remove nginx 1.15.5
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161755150)
+
+* Add nginx 1.14.1, remove nginx 1.14.0
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161755152)
+
+* Add composer 1.7.3, remove composer 1.7.2
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161644852)
+
+* Fix composer_install_options env var by passing it as a space separated string
+  (https://www.pivotaltracker.com/story/show/155737946)
+
+* Merge pull request #253 from pbleuse-orange/develop
+   Fix COMPOSER_INSTALL_OPTIONS ignored
+
+v4.3.63 Oct 29, 2018
+=====================
+
+* Add httpd 2.4.37, remove httpd 2.4.35
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161436928)
+
+* Rebuild php 7.2.9
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/159835693)
+
+* Rebuild php 7.2.11
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161153116)
+
+v4.3.62 Oct 17, 2018
+=====================
+
+* Update default 7.2 version to 7.2.11
+
+* Update apr in httpd extension from 1.6.3 to 1.6.5
+  (https://www.pivotaltracker.com/story/show/160525215)
+
+* Add php 7.2.11, remove php 7.2.8
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161153116)
+
+* Add php 7.1.23, remove php 7.1.20
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/161153113)
+
+* Add php 7.0.32, remove php 7.0.30
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/160479340)
+
+* Add php 5.6.38, remove php 5.6.36
+  for stack(s) cflinuxfs2
+  (https://www.pivotaltracker.com/story/show/160493043)
+
+* Add nginx 1.15.5, remove nginx 1.15.3
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/160928056)
+
+* Add appdynamics 4.5.2.2042, remove appdynamics 4.5.1.1831
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/160843068)
+
+* Add httpd 2.4.35, remove httpd 2.4.34
+  for stack(s) cflinuxfs2, cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/160707119)
+
+* Merge pull request #38: Compile PHP w/Argon2 support & add sodium extension
+  (https://www.pivotaltracker.com/story/show/160094524)
+
+* Merge pull request #277 from dmikusa-pivotal/develop
+  Set LD_LIBRARY_PATH when calling 'php' to list available modules.
+  (https://www.pivotaltracker.com/story/show/160093961)
+
+v4.3.61 Sep 11, 2018
+=====================
+
+* Add newrelic 8.1.0.209 for cflinuxfs3
+
+* Add appdynamics 4.5.1.1831, remove appdynamics 4.5.0.1686
+  for stacks cflinuxfs2, cflinuxfs3 [#160195526]
+
+* Add nginx 1.15.3, remove nginx 1.15.2
+  for stacks cflinuxfs2, cflinuxfs3 [#160100616]
+
+v4.3.60 Aug 24, 2018
+=====================
+
+* Enable igbinary serialization for Redis.
+  (https://www.pivotaltracker.com/story/show/158964915)
+
+* Add php 7.1.21, remove php 7.1.19
+  (https://www.pivotaltracker.com/story/show/159897706)
+
+* Add php 7.2.9, remove php 7.2.7,
+  and update default version to 7.2.9
+  (https://www.pivotaltracker.com/story/show/159835693)
+
+* Add composer 1.7.2, remove composer 1.6.5
+  (https://www.pivotaltracker.com/story/show/159828533)
+  (https://www.pivotaltracker.com/story/show/159594183)
+
+v4.3.59 Aug 02, 2018
+=====================
+
+* Rebuild php 7.0.30, 7.0.31, 7.1.19, 7.1.20, 7.2.7, 7.2.8
+  for stacks cflinuxfs2, cflinuxfs3
+
+* Add appdynamics 4.5.0.1686, remove appdynamics 4.5.0.1547
+  for stacks cflinuxfs2, cflinuxfs3 [#159457304]
+
+* Rebuild nginx 1.14.0, 1.14.0, 1.15.1, 1.15.2
+  for stacks cflinuxfs3 [#159252955]
+
+* Rebuild httpd 2.4.34
+  for stacks cflinuxfs3 [#159251990]
+
+* Add composer 1.7.0-RC, remove composer 1.6.5
+  for stacks cflinuxfs2, cflinuxfs3 [#159270623]
+
+* Rebuild CAAPM 10.7.0
+  for stacks cflinuxfs2, cflinuxfs3 [#159251493]
+
+* Change default php version from 5.6.36 to 7.2.8.
+  (https://www.pivotaltracker.com/story/show/144939015)
+
+* Updates for supporting stacks.
+  (https://www.pivotaltracker.com/story/show/144939015)
+
+v4.3.58 Jul 20, 2018
+=====================
+
+* Add php 5.6.37, remove php 5.6.35
+  (https://www.pivotaltracker.com/story/show/159190033)
+
+* Add php 7.0.31, remove php 7.0.29
+  (https://www.pivotaltracker.com/story/show/159184032)
+
+* Add php 7.1.20, remove php 7.1.17
+  (https://www.pivotaltracker.com/story/show/159191900)
+
+* Add php 7.2.8, remove php 7.2.5
+  (https://www.pivotaltracker.com/story/show/159166665)
+
+* Add appdynamics 4.5.0.1547, remove appdynamics 4.4.3.1216
+  (https://www.pivotaltracker.com/story/show/159025420)
+  (https://www.pivotaltracker.com/story/show/158976533)
+
+* Add httpd 2.4.34, remove httpd 2.4.33
+  (https://www.pivotaltracker.com/story/show/159095662)
+
+* Add nginx 1.15.1, remove nginx 1.15.0
+  (https://www.pivotaltracker.com/story/show/158800160)
+
+v4.3.57 Jun 26, 2018
+=====================
+
+* Add php 7.1.19, remove 7.1.16
+  (https://www.pivotaltracker.com/story/show/158502251)
+
+* Add php 7.2.7, remove 7.2.4
+  (https://www.pivotaltracker.com/story/show/158468183)
+
+v4.3.56 Jun 05, 2018
+=====================
+* Support packaging with associated stacks
+  (https://www.pivotaltracker.com/story/show/153256959)
+
+* Add nginx 1.15.0, remove nginx 1.13.12
+  (https://www.pivotaltracker.com/story/show/158114558)
+
+* Remove nginx 1.12.2.
+  (https://www.pivotaltracker.com/story/show/156851318)
+
+v4.3.55 May 15, 2018
+=====================
+
+* Add default version for CA APM agent
+  (https://www.pivotaltracker.com/story/show/157446795)
+
+* Update default version of newrelic
+  (https://www.pivotaltracker.com/story/show/157204067)
+
+* Add newrelic 8.1.0.209, remove newrelic 8.0.0.204
+  (https://www.pivotaltracker.com/story/show/157204067)
+
+* Add ca_apm_php_agent 10.7.0
+  (https://www.pivotaltracker.com/story/show/157443324)
+  (https://www.pivotaltracker.com/story/show/157446795)
+
+* Update default httpd version to latest
+  (https://www.pivotaltracker.com/story/show/157256902)
+
+* Add httpd 2.4.33, remove httpd 2.4.29
+  (https://www.pivotaltracker.com/story/show/157256902)
+
+* Add appdynamics 4.4.3.1216, remove appdynamics 4.4.2.861
+  (https://www.pivotaltracker.com/story/show/157375734)
+
+v4.3.54 May 08, 2018
+=====================
+* Rebuild php binaries to include GeoIP fix from v4.3.52
+  (https://www.pivotaltracker.com/story/show/157287202)
+
+* Add appdynamics 4.4.3.1216, remove appdynamics 4.4.2.849
+  (https://www.pivotaltracker.com/story/show/157375734)
+  (https://www.pivotaltracker.com/story/show/157323165)
+
+* Add composer 1.6.5, remove composer 1.6.4
+  (https://www.pivotaltracker.com/story/show/157310510)
+
+
+v4.3.53 Apr 27, 2018
+=====================
+
+* Address MS-ISAC ADVISORY NUMBER 2018-046
+(https://www.cisecurity.org/advisory/multiple-vulnerabilities-in-php-could-allow-for-arbitrary-code-execution_2018-046/)
+
+* Add php 7.1.17, 5.6.36; remove 7.1.15, 5.6.34
+
+* Add php 7.2.5, 7.0.30; remove 7.2.3, 7.0.28
+(https://www.pivotaltracker.com/story/show/157055578)
+(https://www.pivotaltracker.com/story/show/157047336)
+
+* Update AppDynamics agent to 4.4.2.849
+  (https://www.pivotaltracker.com/story/show/154849536)
+
+* Add nginx 1.14.0
+  (https://www.pivotaltracker.com/story/show/156851318)
+  (https://www.pivotaltracker.com/story/show/156851407)
+
+* Remove xdebug from php 7.2.X modules
+  (https://www.pivotaltracker.com/story/show/156421465)
+
+* Move auth.json with composer.json, composer.lock if it exists
+  (https://www.pivotaltracker.com/story/show/156248131)
+
+* Add memcached support for php 7.0-7.2
+  (https://www.pivotaltracker.com/story/show/150392071)
+
+
 v4.3.52 Apr 16, 2018
 =====================
 * Due to GeoIP's deprecation of legacy (GeoLite) databases, only the following product IDs are supported under the free license: GeoLite-Legacy-IPv6-City, GeoLite-Legacy-IPv6-Country, 506 (GeoLite Country), 533 (GeoLite City), 517 (GeoLite ASN).

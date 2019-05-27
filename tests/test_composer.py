@@ -128,9 +128,7 @@ class TestComposer(object):
         instance_stub._set_return_value("""{"rate": {"limit": 60, "remaining": 60}}""")
 
         stream_output_stub = Dingus()
-
         rewrite_stub = Dingus()
-
         builder = Dingus(_ctx=ctx)
 
         with patches({
@@ -225,8 +223,8 @@ class TestComposer(object):
         ctx = utils.FormattedDict({
             'BUILD_DIR': 'tests/data/composer',
             'WEBDIR': '',
-            'PHP_56_LATEST': '5.6.31',
-            'ALL_PHP_VERSIONS': ['5.6.31', '5.6.29', '7.0.13', '7.0.14', '7.1.3', '7.1.4']
+            'PHP_71_LATEST': '7.1.4',
+            'ALL_PHP_VERSIONS': ['7.1.3', '7.1.4']
         })
         config = self.extension_module.ComposerConfiguration(ctx)
         config.configure()
@@ -237,7 +235,7 @@ class TestComposer(object):
         assert 'zip' == ctx['PHP_EXTENSIONS'][1]
         assert 'fileinfo' == ctx['PHP_EXTENSIONS'][2]
         assert 'gd' == ctx['PHP_EXTENSIONS'][3]
-        assert '5.6.31' == ctx['PHP_VERSION']
+        assert '7.1.4' == ctx['PHP_VERSION']
         assert 'php' == ctx['PHP_VM']
 
     def test_configure_composer_with_php_version_and_base_extensions(self):
@@ -245,8 +243,8 @@ class TestComposer(object):
             'BUILD_DIR': 'tests/data/composer',
             'WEBDIR': '',
             'PHP_EXTENSIONS': ['a', 'b'],
-            'PHP_56_LATEST': '5.6.31',
-            'ALL_PHP_VERSIONS': ['5.6.31', '5.6.29', '7.0.13', '7.0.14', '7.1.3', '7.1.4']
+            'PHP_71_LATEST': '7.1.4',
+            'ALL_PHP_VERSIONS': ['7.1.3', '7.1.4']
         })
         config = self.extension_module.ComposerConfiguration(ctx)
         config.configure()
@@ -259,18 +257,19 @@ class TestComposer(object):
         assert 'zip' == ctx['PHP_EXTENSIONS'][3]
         assert 'fileinfo' == ctx['PHP_EXTENSIONS'][4]
         assert 'gd' == ctx['PHP_EXTENSIONS'][5]
-        assert '5.6.31' == ctx['PHP_VERSION']
+        assert '7.1.4' == ctx['PHP_VERSION']
         assert 'php' == ctx['PHP_VM']
 
     def test_configure_composer_without_php_version(self):
         ctx = utils.FormattedDict({
             'BUILD_DIR': 'tests/data/composer-no-php',
             'WEBDIR': '',
-            'PHP_VERSION': '5.4.31'  # uses bp default
+            'PHP_DEFAULT': '7.1.3',
+            'PHP_VERSION': '7.1.3'  # uses bp default
         })
         config = self.extension_module.ComposerConfiguration(ctx)
         config.configure()
-        assert '5.4.31' == ctx['PHP_VERSION']
+        assert '7.1.3' == ctx['PHP_VERSION']
         assert 'php' == ctx['PHP_VM']
         assert 'PHP_EXTENSIONS' in ctx.keys()
         assert list == type(ctx['PHP_EXTENSIONS'])
@@ -295,32 +294,39 @@ class TestComposer(object):
         assert 'openssl' not in ctx['PHP_EXTENSIONS']
 
     def test_configure_paths_missing(self):
-        def fcp_test_json(path):
-            tmp = fcp_orig(path)
-            return (tmp[0], None)
+        fcp_orig = self.extension_module.find_composer_path
 
-        def fcp_test_lock(path):
-            tmp = fcp_orig(path)
-            return (None, tmp[1])
+        def find_composer_path_none_found_stub(path, ctx):
+            return None
 
-        def fcp_test_none(path):
-            return (None, None)
+        def find_composer_path_only_json_found_stub(path, ctx):
+            if path == "composer.json":
+                return fcp_orig(path, ctx)
+            return None
+
+        def find_composer_path_only_lock_found_stub(path, ctx):
+            if path == "composer.lock":
+                return fcp_orig(path, ctx)
+            return None
+
         ctx = utils.FormattedDict({
             'BUILD_DIR': 'tests/data/composer',
             'WEBDIR': '',
-            'PHP_56_LATEST': '5.6.31',
-            'ALL_PHP_VERSIONS': ['5.6.31', '5.6.29', '7.0.13', '7.0.14', '7.1.3', '7.1.4']
+            'PHP_71_LATEST': '7.1.4',
+            'PHP_DEFAULT': '7.1.3',
+            'ALL_PHP_VERSIONS': ['7.1.3', '7.1.4']
         })
-        fcp_orig = self.extension_module.find_composer_paths
-        # test when no composer.json or composer.lock files found
-        self.extension_module.find_composer_paths = fcp_test_none
+
+        # test when no composer.json and no composer.lock found
+        self.extension_module.find_composer_path = find_composer_path_none_found_stub
         try:
             self.extension_module.ComposerConfiguration(ctx).configure()
             assert 'PHP_EXTENSIONS' not in ctx.keys()
         finally:
-            self.extension_module.find_composer_paths = fcp_orig
+            self.extension_module.find_composer_path = fcp_orig
+
         # test when composer.json found, but no composer.lock
-        self.extension_module.find_composer_paths = fcp_test_json
+        self.extension_module.find_composer_path = find_composer_path_only_json_found_stub
         try:
             self.extension_module.ComposerConfiguration(ctx).configure()
             assert 'PHP_EXTENSIONS' in ctx.keys()
@@ -329,9 +335,10 @@ class TestComposer(object):
             assert 'fileinfo' in ctx['PHP_EXTENSIONS']
             assert 'zip' in ctx['PHP_EXTENSIONS']
         finally:
-            self.extension_module.find_composer_paths = fcp_orig
+            self.extension_module.find_composer_path = fcp_orig
+
         # test when composer.lock found, but no composer.json
-        self.extension_module.find_composer_paths = fcp_test_lock
+        self.extension_module.find_composer_path = find_composer_path_only_lock_found_stub
         try:
             self.extension_module.ComposerConfiguration(ctx).configure()
             assert 'PHP_EXTENSIONS' in ctx.keys()
@@ -341,13 +348,13 @@ class TestComposer(object):
             assert 'fileinfo' in ctx['PHP_EXTENSIONS']
             assert 'zip' in ctx['PHP_EXTENSIONS']
         finally:
-            self.extension_module.find_composer_paths = fcp_orig
+            self.extension_module.find_composer_path = fcp_orig
 
     def test_find_composer_php_version(self):
         ctx = {'BUILD_DIR': 'tests/data/composer-lock', 'WEBDIR': ''}
         config = self.extension_module.ComposerConfiguration(ctx)
         php_version = config.read_version_from_composer('php')
-        eq_('>=5.3', php_version)
+        eq_('>=7.1', php_version)
 
     def test_composer_invalid_json_causes_system_exit(self):
         ctx = {'BUILD_DIR': 'tests/data/composer-invalid-json', 'WEBDIR': ''}
@@ -359,43 +366,25 @@ class TestComposer(object):
 
     def test_pick_php_version(self):
         ctx = {
-            'PHP_VERSION': '5.6.29',
+            'PHP_VERSION': '7.1.4',
             'BUILD_DIR': '',
-            'PHP_56_LATEST': '5.6.29',
-            'PHP_70_LATEST': '7.0.14',
             'PHP_71_LATEST': '7.1.4',
+            'PHP_DEFAULT': '7.1.3',
             'WEBDIR': '',
-            'ALL_PHP_VERSIONS': ['5.6.28', '5.6.29', '7.0.13', '7.0.14', '7.1.3', '7.1.4']
+            'ALL_PHP_VERSIONS': ['7.1.3', '7.1.4']
         }
         pick_php_version = \
             self.extension_module.ComposerConfiguration(ctx).pick_php_version
-        # default to 5.6
-        # latest PHP 5.6 version
-        eq_('5.6.29', pick_php_version('>=5.6'))
-        eq_('5.6.29', pick_php_version('>=5.6.0'))
-        eq_('5.6.29', pick_php_version('5.6.*'))
-        # exact PHP 5.6 versions
-        eq_('5.6.28', pick_php_version('5.6.28'))
-        # latest PHP 7.0 version
-        eq_('7.0.14', pick_php_version('>=7.0'))
-        eq_('7.0.14', pick_php_version('>=7.0.0'))
-        eq_('7.0.14', pick_php_version('7.0.*'))
-        # exact PHP 7.0 versions
-        eq_('7.0.13', pick_php_version('7.0.13'))
         # PHP 7.1 versions
         eq_('7.1.3', pick_php_version('7.1.3'))
         eq_('7.1.4', pick_php_version('>=7.1'))
         eq_('7.1.4', pick_php_version('>=7.1.0'))
         eq_('7.1.4', pick_php_version('7.1.*'))
+        # Leave version alone?
+        eq_(ctx['PHP_VERSION'], pick_php_version(''))
+        eq_(ctx['PHP_VERSION'], pick_php_version(None))
         # not in buildpack, should default to PHP_VERSION
-        eq_('5.6.29', pick_php_version('7.1.2'))
-        eq_('5.6.29', pick_php_version('7.0.2'))
-        eq_('5.6.29', pick_php_version('5.6.6'))
-        eq_('5.6.29', pick_php_version(''))
-        eq_('5.6.29', pick_php_version(None))
-        eq_('5.6.29', pick_php_version('5.61.1'))
-        eq_('5.6.29', pick_php_version('<5.6'))
-        eq_('5.6.29', pick_php_version('<5.4'))
+        eq_(ctx['PHP_DEFAULT'], pick_php_version('7.1.2'))
 
     def test_empty_platform_section(self):
         exts = self.extension_module.ComposerConfiguration({
