@@ -13,17 +13,15 @@ PKGDOWNLOADS =  {
     #CLI_DRIVER
      'IBMDBCLIDRIVER1_DLFILE': 'linuxx64_odbc_cli.tar.gz',
      'IBMDBCLIDRIVER1_DLURL': 'https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/{IBMDBCLIDRIVER1_DLFILE}',
-    
-    #IBM_DB Packages  
-    'IBM_DB2_VERSION': '1.9.9',
-    'IBM_DB2_REPOSITORY': 'https://github.com/ibmdb/php-buildpack',
-    'IBM_DB2_DLFILE': 'ibm_db2-v{IBM_DB2_VERSION}.tar.gz',
-    'IBM_DB2_DLURL': '{IBM_DB2_REPOSITORY}/raw/master/extensions/ibmdb/Binaries/{IBM_DB2_DLFILE}',
 
-    'PDO_IBM_VERSION': '1.3.4',
-    'PDO_IBM_REPOSITORY': 'https://github.com/ibmdb/php-buildpack',
-    'PDO_IBM_DLFILE': 'pdo_ibm-v{PDO_IBM_VERSION}.tar.gz',
-    'PDO_IBM_DLURL': '{PDO_IBM_REPOSITORY}/raw/master/extensions/ibmdb/Binaries/{PDO_IBM_DLFILE}',
+    #IBM_DB Packages
+    'IBM_DB2_VERSION': '2.0.8',
+    'IBM_DB2_DLFILE': 'ibm_db2-{IBM_DB2_VERSION}.tgz',
+    'IBM_DB2_DLURL': 'https://pecl.php.net/get/{IBM_DB2_DLFILE}',
+
+    'PDO_IBM_VERSION': '1.3.6',
+    'PDO_IBM_DLFILE': 'PDO_IBM-{PDO_IBM_VERSION}.tgz',
+    'PDO_IBM_DLURL': 'https://pecl.php.net/get/{PDO_IBM_DLFILE}',
 }
 
 class IBMDBInstaller(ExtensionHelper):
@@ -47,7 +45,7 @@ class IBMDBInstaller(ExtensionHelper):
     def _defaults(self):
         pkgdownloads = PKGDOWNLOADS
         pkgdownloads['COMPILATION_DIR'] = os.path.join(self._ctx['BUILD_DIR'], '.build_ibmdb_extension')
-        pkgdownloads['DOWNLOAD_DIR'] = os.path.join('{COMPILATION_DIR}', '.downloads')        
+        pkgdownloads['DOWNLOAD_DIR'] = os.path.join('{COMPILATION_DIR}', '.downloads')
         pkgdownloads['IBMDBCLIDRIVER_INSTALL_DIR'] = os.path.join(self._ctx['BUILD_DIR'], 'ibmdb_clidriver')
         pkgdownloads['PHPSOURCE_INSTALL_DIR'] = os.path.join('{COMPILATION_DIR}', 'php')
         pkgdownloads['IBM_DB2_DLDIR'] = os.path.join('{PHPSOURCE_INSTALL_DIR}', 'ext', 'ibm_db')
@@ -83,14 +81,14 @@ class IBMDBInstaller(ExtensionHelper):
         env = {
             #'IBM_DB_HOME': '$IBM_DB_HOME:$HOME/' + self._ibmdbClidriverBaseDir + '/lib',
             'LD_LIBRARY_PATH': '$LD_LIBRARY_PATH:$HOME/' + self._ibmdbClidriverBaseDir + '/lib',
-            'PATH': '$HOME/' + self._ibmdbClidriverBaseDir + '/bin:$HOME/' 
+            'PATH': '$HOME/' + self._ibmdbClidriverBaseDir + '/bin:$HOME/'
                     + self._ibmdbClidriverBaseDir + '/adm:$PATH',
         }
         return env
 
     def _logMsg(self, logMsg):
         self._log.info(logMsg)
-        print logMsg        
+        print logMsg
 
     def _install_direct(self, url, hsh, installDir, fileName=None, strip=False, extract=True):
         if not fileName:
