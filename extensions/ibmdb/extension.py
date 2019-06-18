@@ -98,14 +98,17 @@ class IBMDBInstaller(ExtensionHelper):
         self._installer._dwn.custom_extension_download(url, url, fileToInstall)
 
         if extract:
+            self._logMsg('Installing ' + fileToInstall + ' to ' + installDir)
             return self._installer._unzipUtil.extract(fileToInstall, installDir, strip)
         else:
+            self._logMsg('Copying ' + fileToInstall + ' to ' + installDir)
             shutil.copy(fileToInstall, installDir)
             return installDir
 
     def _runCmd(self, environ, currWorkDir, cmd, displayRunLog=False):
         stringioWriter = StringIO.StringIO()
         try:
+            self._logMsg("Running command: " + ' '.join(cmd))
             stream_output(stringioWriter, ' '.join(cmd), env=environ, cwd=currWorkDir, shell=True)
             cmdOutput = stringioWriter.getvalue()
             if displayRunLog:
@@ -165,8 +168,11 @@ class IBMDBInstaller(ExtensionHelper):
                 self._ctx[ibmdbExtn + '_DLFILE'],
                 True)
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                 ['cp', os.path.join(ibmdbExtnDownloadDir,  self._zendModuleApiNo, ibmdbExtn.lower() + '.so'),
-                  self._phpExtnDpath])
+                ['find', ibmdbExtnDownloadDir, ("-name '" + ibmdbExtn.lower() + ".so'"),
+                self._phpExtnDpath])
+            self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
+                ['cp', os.path.join(ibmdbExtnDownloadDir,  self._zendModuleApiNo, ibmdbExtn.lower() + '.so'),
+                self._phpExtnDpath])
             self._logMsg ('Installed extension ' + ibmdbExtn)
         self._logMsg('-- Downloaded IBM DB Extensions ------------------')
 
