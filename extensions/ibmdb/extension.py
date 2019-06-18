@@ -159,10 +159,27 @@ class IBMDBInstaller(ExtensionHelper):
         self._logMsg('-- Installed IBM DB CLI Drivers ------------------')
 
     def install_extensions(self):
-        self._logMsg('-- Wait let me try something here... -----------------')
-        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['pecl', "install", "ibm_db2"], True)
-        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['pecl', "install", "pdo_ibm"], True)
+        self._logMsg('-- Downloading IBM DB Extensions -----------------')
+        for ibmdbExtn in ['IBM_DB2', 'PDO_IBM']:
+            ibmdbExtnDownloadDir = self._ctx[ibmdbExtn + '_DLDIR']
+            self._install_direct(
+                self._ctx[ibmdbExtn + '_DLURL'],
+                None,
+                ibmdbExtnDownloadDir,
+                self._ctx[ibmdbExtn + '_DLFILE'],
+                True)
 
+            # Make and Install
+            self._runCmd(self._compilationEnv, ibmdbExtnDownloadDir, ['ls', "-l"], True)
+            self._runCmd(self._compilationEnv, ibmdbExtnDownloadDir, ['phpize && ./configure'], True)
+            self._runCmd(self._compilationEnv, ibmdbExtnDownloadDir, ['make && make install'], True)
+            self._runCmd(self._compilationEnv, ibmdbExtnDownloadDir, ['ls', "-l"], True)
+
+            self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
+                ['cp', os.path.join(ibmdbExtnDownloadDir,  self._zendModuleApiNo, ibmdbExtn.lower() + '.so'),
+                self._phpExtnDpath])
+            self._logMsg ('Installed extension ' + ibmdbExtn)
+        self._logMsg('-- Downloaded IBM DB Extensions ------------------')
     def cleanup(self):
         self._logMsg('-- Some House-keeping ----------------------------')
         self._runCmd(os.environ, self._ctx['BUILD_DIR'], ['rm', '-rf', self._ctx['COMPILATION_DIR']])
