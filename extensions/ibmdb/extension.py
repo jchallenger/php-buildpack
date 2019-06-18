@@ -168,7 +168,7 @@ class IBMDBInstaller(ExtensionHelper):
                 self._ctx[ibmdbExtn + '_DLFILE'],
                 True)
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                ['ls', ibmdbExtnDownloadDir, "-R"])
+                ['ls', ibmdbExtnDownloadDir, "-R"], True)
 
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
                 ['cp', os.path.join(ibmdbExtnDownloadDir,  ibmdbExtn.lower() + '.so'),
