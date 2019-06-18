@@ -71,7 +71,7 @@ class IBMDBInstaller(ExtensionHelper):
         self._phpExtnDpath = os.path.join(self._phpBuildRootDpath, 'lib', 'php', 'extensions', self._phpExtnDir)
 
         self.install_clidriver()
-        self.download_extensions()
+        self.install_extensions()
         self.modifyPhpIni()
         self.cleanup()
         return 0
@@ -136,8 +136,9 @@ class IBMDBInstaller(ExtensionHelper):
             pos = lines.index(extns[-1]) + 1
         else:
             pos = lines.index('#{PHP_EXTENSIONS}\n') + 1
+
+        # lines.insert(pos, 'extension=pdo.so\n')
         lines.insert(pos, 'extension=ibm_db2.so\n')
-        lines.insert(pos, 'extension=pdo.so\n')
         lines.insert(pos, 'extension=pdo_ibm.so\n')
         with open(self._phpBuildIniFpath, 'wt') as phpIni:
             for line in lines:
@@ -157,24 +158,10 @@ class IBMDBInstaller(ExtensionHelper):
         self._compilationEnv['IBM_DB_HOME'] = self._ctx['IBMDBCLIDRIVER_INSTALL_DIR']
         self._logMsg('-- Installed IBM DB CLI Drivers ------------------')
 
-    def download_extensions(self):
-        self._logMsg('-- Downloading IBM DB Extensions -----------------')
-        for ibmdbExtn in ['IBM_DB2', 'PDO_IBM']:
-            ibmdbExtnDownloadDir = self._ctx[ibmdbExtn + '_DLDIR']
-            self._install_direct(
-                self._ctx[ibmdbExtn + '_DLURL'],
-                None,
-                ibmdbExtnDownloadDir,
-                self._ctx[ibmdbExtn + '_DLFILE'],
-                True)
-            self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                ['ls', ibmdbExtnDownloadDir, "-R"], True)
-
-            self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                ['cp', os.path.join(ibmdbExtnDownloadDir,  ibmdbExtn.lower() + '.so'),
-                self._phpExtnDpath])
-            self._logMsg ('Installed extension ' + ibmdbExtn)
-        self._logMsg('-- Downloaded IBM DB Extensions ------------------')
+    def install_extensions(self):
+        self._logMsg('-- Wait let me try something here... -----------------')
+        # self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['pecl', "install", "ibm_db2"], True)
+        # self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['pecl', "install", "pdo_ibm"], True)
 
     def cleanup(self):
         self._logMsg('-- Some House-keeping ----------------------------')
