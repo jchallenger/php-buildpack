@@ -168,10 +168,10 @@ class IBMDBInstaller(ExtensionHelper):
                 self._ctx[ibmdbExtn + '_DLFILE'],
                 True)
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                ['find', ibmdbExtnDownloadDir, ("-name '" + ibmdbExtn.lower() + ".so'"),
-                self._phpExtnDpath])
+                ['find', ibmdbExtnDownloadDir, ("-name '" + ibmdbExtn.lower() + ".so'")])
+
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                ['cp', os.path.join(ibmdbExtnDownloadDir,  self._zendModuleApiNo, ibmdbExtn.lower() + '.so'),
+                ['cp', os.path.join(ibmdbExtnDownloadDir,  ibmdbExtn.lower() + '.so'),
                 self._phpExtnDpath])
             self._logMsg ('Installed extension ' + ibmdbExtn)
         self._logMsg('-- Downloaded IBM DB Extensions ------------------')
