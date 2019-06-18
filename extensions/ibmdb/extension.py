@@ -88,7 +88,7 @@ class IBMDBInstaller(ExtensionHelper):
 
     def _logMsg(self, logMsg):
         self._log.info(logMsg)
-        print logMsg
+        print("IBM_DB2: " + logMsg)
 
     def _install_direct(self, url, hsh, installDir, fileName=None, strip=False, extract=True):
         if not fileName:
@@ -115,8 +115,8 @@ class IBMDBInstaller(ExtensionHelper):
                 self._logMsg(cmdOutput)
         except:
             cmdOutput = stringioWriter.getvalue()
-            print '-----> Command failed'
-            print cmdOutput
+            print('-----> Command failed')
+            print(cmdOutput)
             raise
         return cmdOutput
 
@@ -160,8 +160,8 @@ class IBMDBInstaller(ExtensionHelper):
 
     def install_extensions(self):
         self._logMsg('-- Wait let me try something here... -----------------')
-        # self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['pecl', "install", "ibm_db2"], True)
-        # self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['pecl', "install", "pdo_ibm"], True)
+        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['pecl', "install", "ibm_db2"], True)
+        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['pecl', "install", "pdo_ibm"], True)
 
     def cleanup(self):
         self._logMsg('-- Some House-keeping ----------------------------')
