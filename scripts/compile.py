@@ -52,6 +52,8 @@ if __name__ == '__main__':
             .extension()
                 .from_build_pack('extensions/sessions')
             .extension()
+                .from_build_pack('extensions/ibmdb')
+            .extension()
                 .from_build_pack('extensions/composer')
             .extensions()
                 .from_application('.extensions')
