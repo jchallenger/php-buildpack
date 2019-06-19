@@ -11,8 +11,8 @@ from extension_helpers import ExtensionHelper
 
 PKGDOWNLOADS =  {
     #CLI_DRIVER
-     'IBMDBCLIDRIVER1_DLFILE': 'linuxx64_odbc_cli.tar.gz',
-     'IBMDBCLIDRIVER1_DLURL': 'https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/{IBMDBCLIDRIVER1_DLFILE}',
+    'IBMDBCLIDRIVER1_DLFILE': 'linuxx64_odbc_cli.tar.gz',
+    'IBMDBCLIDRIVER1_DLURL': 'https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/{IBMDBCLIDRIVER1_DLFILE}',
 
     #IBM_DB Packages
     'IBM_DB2_VERSION': '2.0.8',
@@ -41,6 +41,27 @@ class IBMDBInstaller(ExtensionHelper):
         self._ibmdbClidriverBaseDir = 'ibmdb_clidriver'
         self._phpBuildRootDpath = os.path.join(self._ctx['BUILD_DIR'], 'php')
         self._phpBuildIniFpath = os.path.join(self._phpBuildRootDpath, 'etc', 'php.ini')
+        self._load_php_info()
+
+    def _load_php_info(self):
+        self.php_ini_path = os.path.join(self._ctx['BUILD_DIR'], 'php', 'etc', 'php.ini')
+        self._php_extn_dir = self._find_php_extn_dir()
+        self._php_api, self._php_zts = self._parse_php_api()
+        self._logMsg("Detected PHP API [%s] ZTS: [%s]",
+                        self._php_api, self._php_zts)
+
+    def _find_php_extn_dir(self):
+        with open(self.php_ini_path, 'rt') as php_ini:
+            for line in php_ini.readlines():
+                if line.startswith('extension_dir'):
+                    (key, val) = line.strip().split(' = ')
+                    return val.strip('"')
+
+    def _parse_php_api(self):
+        tmp = os.path.basename(self._php_extn_dir)
+        php_api = tmp.split('-')[-1]
+        php_zts = (tmp.find('non-zts') == -1)
+        return php_api, php_zts
 
     def _defaults(self):
         pkgdownloads = PKGDOWNLOADS
@@ -71,6 +92,7 @@ class IBMDBInstaller(ExtensionHelper):
         self._phpExtnDpath = os.path.join(self._phpBuildRootDpath, 'lib', 'php', 'extensions', self._phpExtnDir)
 
         self.install_clidriver()
+        self.install_dependencies()
         self.install_extensions()
         self.modifyPhpIni()
         self.cleanup()
@@ -158,6 +180,14 @@ class IBMDBInstaller(ExtensionHelper):
         self._compilationEnv['IBM_DB_HOME'] = self._ctx['IBMDBCLIDRIVER_INSTALL_DIR']
         self._logMsg('-- Installed IBM DB CLI Drivers ------------------')
 
+    def install_dependencies():
+        self._logMsg("Installing build dependencies manually...")
+
+        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
+                     ['yum', "install", "php72-php-devel"], True)
+        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
+                     ["ln -s", "/opt/remi/php72/root/bin/phpize", "/usr/bin/phpize"])
+
     def install_extensions(self):
         self._logMsg('-- Downloading IBM DB Extensions -----------------')
         for ibmdbExtn in ['IBM_DB2', 'PDO_IBM']:
@@ -170,10 +200,9 @@ class IBMDBInstaller(ExtensionHelper):
                 True)
 
             # Make and Install
-            self._runCmd(self._compilationEnv, ibmdbExtnDownloadDir, ['ls', "-l"], True)
             self._runCmd(self._compilationEnv, ibmdbExtnDownloadDir, ['phpize && ./configure'], True)
             self._runCmd(self._compilationEnv, ibmdbExtnDownloadDir, ['make && make install'], True)
-            self._runCmd(self._compilationEnv, ibmdbExtnDownloadDir, ['ls', "-l"], True)
+            self._runCmd(self._compilationEnv, ibmdbExtnDownloadDir, ['ls', "-R"], True)
 
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
                 ['cp', os.path.join(ibmdbExtnDownloadDir,  self._zendModuleApiNo, ibmdbExtn.lower() + '.so'),
