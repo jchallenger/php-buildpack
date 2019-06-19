@@ -41,27 +41,6 @@ class IBMDBInstaller(ExtensionHelper):
         self._ibmdbClidriverBaseDir = 'ibmdb_clidriver'
         self._phpBuildRootDpath = os.path.join(self._ctx['BUILD_DIR'], 'php')
         self._phpBuildIniFpath = os.path.join(self._phpBuildRootDpath, 'etc', 'php.ini')
-        self._load_php_info()
-
-    def _load_php_info(self):
-        self.php_ini_path = os.path.join(self._ctx['BUILD_DIR'], 'php', 'etc', 'php.ini')
-        self._php_extn_dir = self._find_php_extn_dir()
-        self._php_api, self._php_zts = self._parse_php_api()
-        self._logMsg("Detected PHP API [%s] ZTS: [%s]",
-                        self._php_api, self._php_zts)
-
-    def _find_php_extn_dir(self):
-        with open(self.php_ini_path, 'rt') as php_ini:
-            for line in php_ini.readlines():
-                if line.startswith('extension_dir'):
-                    (key, val) = line.strip().split(' = ')
-                    return val.strip('"')
-
-    def _parse_php_api(self):
-        tmp = os.path.basename(self._php_extn_dir)
-        php_api = tmp.split('-')[-1]
-        php_zts = (tmp.find('non-zts') == -1)
-        return php_api, php_zts
 
     def _defaults(self):
         pkgdownloads = PKGDOWNLOADS
@@ -90,6 +69,13 @@ class IBMDBInstaller(ExtensionHelper):
         self._phpExtnDir = self.findPhpExtnBaseDir()
         self._zendModuleApiNo = self._phpExtnDir[len(self._phpExtnDir)-8:]
         self._phpExtnDpath = os.path.join(self._phpBuildRootDpath, 'lib', 'php', 'extensions', self._phpExtnDir)
+
+        self._logMsg("PHP Build INI Path [%s]" % self._phpBuildIniFpath)
+        self._logMsg("PHP Root D Path [%s]" % self._phpBuildRootDpath)
+        self._logMsg("PHP Extension Dir [%s]" % self._phpExtnDir)
+        self._logMsg("PHP Extension D Path [%s]" % self._phpExtnDpath)
+
+        self._logMsg("Zend Module API # [%s]" % self._zendModuleApiNo)
 
         self.install_clidriver()
         self.install_dependencies()
