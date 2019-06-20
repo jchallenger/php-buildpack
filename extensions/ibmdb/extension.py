@@ -97,7 +97,7 @@ class IBMDBInstaller(ExtensionHelper):
             return self._installer._unzipUtil.extract(fileToInstall, installDir, strip)
         else:
             self._logMsg('Copying ' + fileToInstall + ' to ' + installDir)
-            shutil.copy(fileToInstall, installDir)
+            self._runCmd(os.environ, self._ctx['BUILD_DIR'], ['cp', fileToInstall, installDir])
             return installDir
 
     def _runCmd(self, environ, currWorkDir, cmd, displayRunLog=False):
