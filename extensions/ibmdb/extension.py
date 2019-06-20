@@ -162,6 +162,7 @@ class IBMDBInstaller(ExtensionHelper):
             None,
             ibmdbExtnDownloadDir,
             self._ctx['IBM_DB2_DLFILE'],
+            True,
             False)
 
         # copy binary to extension folder
