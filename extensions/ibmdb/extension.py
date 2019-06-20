@@ -168,14 +168,11 @@ class IBMDBInstaller(ExtensionHelper):
 
     def install_dependencies(self):
         self._logMsg("-- Installing build dependencies manually --------")
-        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                    ['apt-get', 'update',  '-y'])
-        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                    ['apt-get', 'upgrade',  '-y'])
+        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['sudo', 'apt-get', 'update',  '-y'])
+        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['sudo', 'apt-get', 'upgrade',  '-y'])
 
         self._logMsg("-- Installing PHP Devel (for PHPize) -------------")
-        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                    ['apt-get', 'install',  'php-dev', '-y'])
+        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'], ['sudo', 'apt-get', 'install',  'php-dev', '-y'])
 
     def install_extensions(self):
         self._logMsg('-- Downloading IBM DB Extensions -----------------')
