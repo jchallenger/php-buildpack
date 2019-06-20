@@ -167,12 +167,15 @@ class IBMDBInstaller(ExtensionHelper):
         self._logMsg('-- Installed IBM DB CLI Drivers ------------------')
 
     def install_dependencies(self):
-        self._logMsg("Installing build dependencies manually...")
+        self._logMsg("-- Installing build dependencies manually --------")
+        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
+                    ['apt-get', 'update',  '-y'])
+        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
+                    ['apt-get', 'upgrade',  '-y'])
 
+        self._logMsg("-- Installing PHP Devel (for PHPize) -------------")
         self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                     ['yum', "install", "php72-php-devel"], True)
-        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                     ["ln -s", "/opt/remi/php72/root/bin/phpize", "/usr/bin/phpize"], True)
+                    ['apt-get', 'install',  'php-dev', '-y'])
 
     def install_extensions(self):
         self._logMsg('-- Downloading IBM DB Extensions -----------------')
