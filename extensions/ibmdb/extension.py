@@ -98,6 +98,7 @@ class IBMDBInstaller(ExtensionHelper):
         else:
             self._logMsg('Copying ' + fileToInstall + ' to ' + installDir)
             self._runCmd(os.environ, self._ctx['BUILD_DIR'], ['cp', fileToInstall, installDir])
+            self._runCmd(os.environ, self._ctx['BUILD_DIR'], ['ls', '-R', installDir])
             return installDir
 
     def _runCmd(self, environ, currWorkDir, cmd, displayRunLog=False):
@@ -157,7 +158,7 @@ class IBMDBInstaller(ExtensionHelper):
         ibmdbExtnDownloadDir = self._ctx['IBM_DB2_DLDIR']
 
         # download binary from our repo
-        self._install_direct(
+        installDir = self._install_direct(
             self._ctx['IBM_DB2_DLURL'],
             None,
             ibmdbExtnDownloadDir,
@@ -167,8 +168,7 @@ class IBMDBInstaller(ExtensionHelper):
 
         # copy binary to extension folder
         self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-            ['cp', os.path.join(ibmdbExtnDownloadDir,  'ibm_db2.so'),
-            self._phpExtnDpath])
+            ['cp', os.path.join(ibmdbExtnDownloadDir,  self._ctx['IBM_DB2_DLFILE']), os.path.join(self._phpExtnDpath, "ibm_db2.so")])
 
         self._logMsg('-- Downloaded IBM DB Extension ------------------')
 
