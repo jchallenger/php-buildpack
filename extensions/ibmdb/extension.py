@@ -169,7 +169,7 @@ class IBMDBInstaller(ExtensionHelper):
 
             self._logMsg('Successful TEMP Install ' + installed)
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                ['ls -R', installed])
+                ['ls -R', installed], True)
 
             # copy binary to extension folder
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
