@@ -90,6 +90,7 @@ class IBMDBInstaller(ExtensionHelper):
             fileName = urlparse(url).path.split('/')[-1]
         fileToInstall = os.path.join(self._ctx['TMPDIR'], fileName)
         self._runCmd(os.environ, self._ctx['BUILD_DIR'], ['rm', '-rf', fileToInstall])
+        self._logMsg("  Downloading: " + url + " [" + fileToInstall + "]")
         self._installer._dwn.custom_extension_download(url, url, fileToInstall)
 
         if extract:
@@ -172,7 +173,7 @@ class IBMDBInstaller(ExtensionHelper):
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
                 ['cp', os.path.join(installed, self._zendModuleApiNo, "ibm_db2.so"), os.path.join(self._phpExtnDpath, "ibm_db2.so")])
             pass
-        except expression as identifier:
+        except:
             self._log.error("Failed to install DB2 Extension")
             self._logMsg("IBM Ext DL Dir: " + ibmdbExtnDownloadDir)
             self._logMsg("IBM Ext DL File: " + self._ctx['IBM_DB2_DLFILE'])
