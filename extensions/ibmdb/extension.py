@@ -98,8 +98,8 @@ class IBMDBInstaller(ExtensionHelper):
         else:
             self._logMsg('Copying ' + fileToInstall + ' to ' + installDir)
             self._runCmd(os.environ, self._ctx['BUILD_DIR'], ['cp', fileToInstall, installDir])
-            self._runCmd(os.environ, self._ctx['BUILD_DIR'], ['ls', '-R', installDir])
-            return installDir
+            self._runCmd(os.environ, self._ctx['BUILD_DIR'], ['ls', '-l', installDir])
+            return fileToInstall
 
     def _runCmd(self, environ, currWorkDir, cmd, displayRunLog=False):
         stringioWriter = StringIO.StringIO()
@@ -157,18 +157,30 @@ class IBMDBInstaller(ExtensionHelper):
         self._logMsg('-- Downloading IBM DB Extension -----------------')
         ibmdbExtnDownloadDir = self._ctx['IBM_DB2_DLDIR']
 
-        # download binary from our repo
-        installDir = self._install_direct(
-            self._ctx['IBM_DB2_DLURL'],
-            None,
-            ibmdbExtnDownloadDir,
-            self._ctx['IBM_DB2_DLFILE'],
-            True,
-            False)
+        try:
+            # download binary from our repo
+            installedFile = self._install_direct(
+                self._ctx['IBM_DB2_DLURL'],
+                None,
+                ibmdbExtnDownloadDir,
+                self._ctx['IBM_DB2_DLFILE'],
+                True,
+                False)
 
-        # copy binary to extension folder
-        self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-            ['cp', os.path.join(ibmdbExtnDownloadDir,  self._ctx['IBM_DB2_DLFILE']), os.path.join(self._phpExtnDpath, "ibm_db2.so")])
+            self._logMsg('Successful TEMP Install ' + installedFile)
+
+            # copy binary to extension folder
+            self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
+                ['cp', installedFile, os.path.join(self._phpExtnDpath, "ibm_db2.so")])
+            pass
+        except expression as identifier:
+            self._log.error("Failed to install DB2 Extension")
+            self._logMsg("IBM Ext DL Dir: " + ibmdbExtnDownloadDir)
+            self._logMsg("IBM Ext DL File: " + self._ctx['IBM_DB2_DLFILE'])
+            self._logMsg("IBM Ext Final Dest: " + os.path.join(self._phpExtnDpath, "ibm_db2.so"))
+
+            pass
+
 
         self._logMsg('-- Downloaded IBM DB Extension ------------------')
 
