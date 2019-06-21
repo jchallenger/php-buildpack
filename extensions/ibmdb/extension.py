@@ -167,13 +167,9 @@ class IBMDBInstaller(ExtensionHelper):
                 self._ctx['IBM_DB2_DLFILE'],
                 True)
 
-            self._logMsg('Successful TEMP Install ' + installed)
-            self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                ['ls -R', installed], True)
-
             # copy binary to extension folder
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                ['cp', os.path.join(installed, self._zendModuleApiNo, "ibm_db2.so"), os.path.join(self._phpExtnDpath, "ibm_db2.so")])
+                ['cp', os.path.join(installed, "ibm_db2.so"), os.path.join(self._phpExtnDpath, "ibm_db2.so")])
             pass
         except:
             self._log.error("Failed to install DB2 Extension")
