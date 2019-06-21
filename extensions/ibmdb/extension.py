@@ -16,7 +16,7 @@ PKGDOWNLOADS =  {
 
     #IBM_DB Packages
     'IBM_DB2_VERSION': '2.0.8',
-    'IBM_DB2_DLFILE': 'ibm_db2-{IBM_DB2_VERSION}.so',
+    'IBM_DB2_DLFILE': 'ibm_db2-{IBM_DB2_VERSION}.tar.gz',
     'IBM_DB2_DLURL': 'https://github.com/jchallenger/php-buildpack/raw/master/extensions/ibmdb/bin/{IBM_DB2_DLFILE}',
 }
 
@@ -159,19 +159,18 @@ class IBMDBInstaller(ExtensionHelper):
 
         try:
             # download binary from our repo
-            installedFile = self._install_direct(
+            installed = self._install_direct(
                 self._ctx['IBM_DB2_DLURL'],
                 None,
                 ibmdbExtnDownloadDir,
                 self._ctx['IBM_DB2_DLFILE'],
-                True,
-                False)
+                True)
 
-            self._logMsg('Successful TEMP Install ' + installedFile)
+            self._logMsg('Successful TEMP Install ' + installed)
 
             # copy binary to extension folder
             self._runCmd(self._compilationEnv, self._ctx['BUILD_DIR'],
-                ['cp', installedFile, os.path.join(self._phpExtnDpath, "ibm_db2.so")])
+                ['cp', os.path.join(installed, self._zendModuleApiNo, "ibm_db2.so"), os.path.join(self._phpExtnDpath, "ibm_db2.so")])
             pass
         except expression as identifier:
             self._log.error("Failed to install DB2 Extension")
